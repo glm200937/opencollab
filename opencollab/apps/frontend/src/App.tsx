@@ -1,15 +1,32 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
+import { lazy, Suspense } from 'react'
+import { ProtectedRoute } from './components/ProtectedRoute'
 
-// Pages (à créer module par module)
-const LoginPage    = () => <div className="flex h-screen items-center justify-center text-2xl font-semibold">🔐 Login — coming soon</div>
-const DashboardPage = () => <div className="flex h-screen items-center justify-center text-2xl font-semibold">🏠 Dashboard — coming soon</div>
+const LoginPage    = lazy(() => import('./pages/LoginPage'))
+const RegisterPage = lazy(() => import('./pages/RegisterPage'))
+const DashboardPage = lazy(() => import('./pages/DashboardPage'))
+
+function PageLoader() {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-gray-950">
+      <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-600 border-t-brand-500" />
+    </div>
+  )
+}
 
 export default function App() {
   return (
-    <Routes>
-      <Route path="/login"  element={<LoginPage />} />
-      <Route path="/dashboard" element={<DashboardPage />} />
-      <Route path="*" element={<Navigate to="/dashboard" replace />} />
-    </Routes>
+    <Suspense fallback={<PageLoader />}>
+      <Routes>
+        <Route path="/login"    element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/dashboard" element={
+          <ProtectedRoute>
+            <DashboardPage />
+          </ProtectedRoute>
+        } />
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      </Routes>
+    </Suspense>
   )
 }

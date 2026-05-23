@@ -1,6 +1,9 @@
 import 'dotenv/config'
 import Fastify from 'fastify'
 import cors from '@fastify/cors'
+import websocket from '@fastify/websocket'
+import { ensureBucket } from './lib/minio.js'
+import { registerNotesWs } from './modules/notes/notes.ws.js'
 
 const app = Fastify({
   logger: {
@@ -16,28 +19,35 @@ await app.register(cors, {
   credentials: true,
 })
 
-// ── Routes ─────────────────────────────────────────────────────────────────
-const { authRoutes } = await import('./modules/auth/auth.routes.js')
-await app.register(authRoutes, { prefix: '/api/auth' })
+await app.register(websocket)
 
-// ── Health check ───────────────────────────────────────────────────────────
+// ── Routes ─────────────────────────────────────────────────────────────────
+const { authRoutes }  = await import('./modules/auth/auth.routes.js')
+const { filesRoutes } = await import('./modules/files/files.routes.js')
+const { notesRoutes } = await import('./modules/notes/notes.routes.js')
+
+await app.register(authRoutes,  { prefix: '/api/auth' })
+await app.register(filesRoutes, { prefix: '/api/files' })
+await app.register(notesRoutes, { prefix: '/api/notes' })
+
+// ── Health ─────────────────────────────────────────────────────────────────
 app.get('/health', async () => ({
-  status: 'ok',
-  version: '0.2.0',
+  status: 'ok', version: '0.4.0',
   timestamp: new Date().toISOString(),
 }))
 
-// ── 404 handler ────────────────────────────────────────────────────────────
-app.setNotFoundHandler((_request, reply) => {
+// ── Handlers globaux ───────────────────────────────────────────────────────
+app.setNotFoundHandler((_req, reply) => {
   reply.status(404).send({ error: 'Route introuvable', code: 'NOT_FOUND' })
 })
-
-// ── Error handler ──────────────────────────────────────────────────────────
-app.setErrorHandler((error, _request, reply) => {
+app.setErrorHandler((error, _req, reply) => {
   app.log.error(error)
   reply.status(500).send({ error: 'Erreur serveur interne', code: 'INTERNAL_ERROR' })
 })
 
-// ── Start ──────────────────────────────────────────────────────────────────
+// ── Démarrage ──────────────────────────────────────────────────────────────
+await ensureBucket()
+await registerNotesWs(app)
+
 const PORT = Number(process.env.PORT ?? 3001)
 await app.listen({ port: PORT, host: '0.0.0.0' })

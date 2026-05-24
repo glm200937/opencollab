@@ -3,10 +3,11 @@ import { useAuth } from '../hooks/useAuth'
 import { Button } from '../components/ui/Button'
 
 const MODULES = [
-  { path: '/files', icon: '📁', label: 'Fichiers',  desc: 'Upload, partage et versioning' },
-  { path: '/notes', icon: '📝', label: 'Notes',     desc: 'Éditeur collaboratif temps réel' },
-  { path: '/tasks', icon: '📋', label: 'Tâches',    desc: 'Kanban boards et organisation' },
-  { path: '/chat',  icon: '💬', label: 'Chat',      desc: 'Messagerie temps réel par salon' },
+  { path: '/files', icon: '📁', label: 'Fichiers',       desc: 'Upload, partage et versioning' },
+  { path: '/notes', icon: '📝', label: 'Notes',          desc: 'Éditeur collaboratif temps réel' },
+  { path: '/tasks', icon: '📋', label: 'Tâches',         desc: 'Kanban boards et organisation' },
+  { path: '/chat',  icon: '💬', label: 'Chat',           desc: 'Messagerie temps réel par salon' },
+  { path: '/git',   icon: '💻', label: 'Code',           desc: 'Dépôts Git, commits, issues, PRs' },
 ]
 
 export default function DashboardPage() {
@@ -25,7 +26,7 @@ export default function DashboardPage() {
           <Button variant="ghost" size="sm" onClick={logout}>Déconnexion</Button>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {MODULES.map((mod) => (
             <Link key={mod.path} to={mod.path}
               className="group rounded-xl border border-gray-800 bg-gray-900 p-5 transition-all duration-150 hover:border-gray-600 hover:bg-gray-800"
@@ -38,7 +39,7 @@ export default function DashboardPage() {
         </div>
 
         <p className="mt-12 text-center text-xs text-gray-700">
-          OpenCollab v1.0.0 · open source · auto-hébergeable 🎉
+          OpenCollab v1.1.0 · open source · auto-hébergeable 🚀
         </p>
       </div>
     </div>

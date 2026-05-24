@@ -2,9 +2,12 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { lazy, Suspense } from 'react'
 import { ProtectedRoute } from './components/ProtectedRoute'
 
-const LoginPage    = lazy(() => import('./pages/LoginPage'))
-const RegisterPage = lazy(() => import('./pages/RegisterPage'))
+const LoginPage     = lazy(() => import('./pages/LoginPage'))
+const RegisterPage  = lazy(() => import('./pages/RegisterPage'))
 const DashboardPage = lazy(() => import('./pages/DashboardPage'))
+const FilesPage     = lazy(() => import('./pages/FilesPage'))
+const NotesPage     = lazy(() => import('./pages/NotesPage'))
+const TasksPage     = lazy(() => import('./pages/TasksPage'))
 
 function PageLoader() {
   return (
@@ -20,12 +23,11 @@ export default function App() {
       <Routes>
         <Route path="/login"    element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-        <Route path="/dashboard" element={
-          <ProtectedRoute>
-            <DashboardPage />
-          </ProtectedRoute>
-        } />
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+        <Route path="/files"    element={<ProtectedRoute><FilesPage /></ProtectedRoute>} />
+        <Route path="/notes"    element={<ProtectedRoute><NotesPage /></ProtectedRoute>} />
+        <Route path="/tasks"    element={<ProtectedRoute><TasksPage /></ProtectedRoute>} />
+        <Route path="*"         element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </Suspense>
   )

@@ -5,8 +5,9 @@
 **Plateforme collaborative open source, auto-hébergeable et modulaire**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![CI](https://github.com/YOUR_USERNAME/opencollab/actions/workflows/ci.yml/badge.svg)](https://github.com/YOUR_USERNAME/opencollab/actions)
+[![CI](https://github.com/glm200937/opencollab/actions/workflows/ci.yml/badge.svg)](https://github.com/glm200937/opencollab/actions)
 [![pnpm](https://img.shields.io/badge/managed%20with-pnpm-orange)](https://pnpm.io)
+[![Version](https://img.shields.io/badge/version-1.0.0-green)](https://github.com/glm200937/opencollab)
 
 </div>
 
@@ -16,12 +17,11 @@
 
 | Module | Description | Statut |
 |--------|-------------|--------|
-| 📁 Fichiers | Upload, versioning, partage | 🔧 En cours |
-| 📝 Notes | Éditeur collaboratif temps réel (TipTap + Y.js) | 🔧 En cours |
-| 💻 Code | Dépôts Git via Gitea intégré | 🔧 En cours |
-| 📊 Organisation | Kanban, tâches, calendrier | 🔧 En cours |
-| 💬 Chat | Messagerie par workspace | 🔧 En cours |
-| 🔐 Sécurité | Auth JWT, rôles, permissions | 🔧 En cours |
+| 🔐 Auth | JWT, register, login, refresh token | ✅ v0.2 |
+| 📁 Fichiers | Upload MinIO, drag & drop, versioning | ✅ v0.3 |
+| 📝 Notes | Éditeur collaboratif temps réel (TipTap + Y.js) | ✅ v0.4 |
+| 📋 Tâches | Kanban boards, drag & drop, priorités | ✅ v0.5 |
+| 💬 Chat | Messagerie temps réel Socket.io, salons | ✅ v0.6 |
 
 ---
 
@@ -30,10 +30,10 @@
 ```
 monorepo (pnpm workspaces)
 ├── apps/
-│   ├── frontend    → React 19 + Vite + TailwindCSS
-│   └── backend     → Fastify + Prisma + Socket.io
+│   ├── frontend    → React 19 + Vite + TailwindCSS + TipTap + Socket.io
+│   └── backend     → Fastify + Prisma + Socket.io + Y.js WebSocket
 └── packages/
-    └── types       → Types TypeScript partagés
+    └── types       → Types TypeScript partagés front/back
 ```
 
 **Services self-hosted :** PostgreSQL · Redis · MinIO · Gitea · Caddy
@@ -49,7 +49,7 @@ monorepo (pnpm workspaces)
 
 ### 1. Cloner et installer
 ```bash
-git clone https://github.com/YOUR_USERNAME/opencollab.git
+git clone https://github.com/glm200937/opencollab.git
 cd opencollab
 pnpm install
 ```
@@ -75,22 +75,26 @@ pnpm --filter @opencollab/backend db:migrate
 pnpm dev
 ```
 
-Frontend : http://localhost:5173  
-Backend  : http://localhost:3001  
-Gitea    : http://localhost:3000  
-MinIO    : http://localhost:9001  
+| Service | URL |
+|---------|-----|
+| Frontend | http://localhost:5173 |
+| Backend API | http://localhost:3001 |
+| Gitea | http://localhost:3000 |
+| MinIO console | http://localhost:9001 |
 
 ---
 
 ## 📦 Roadmap
 
-- **v0.1** — Monorepo, auth, structure de base ← *vous êtes ici*
-- **v0.2** — Module fichiers (MinIO) + API REST complète
-- **v0.3** — Module notes collaboratives (TipTap + Y.js)
-- **v0.4** — Module tâches (Kanban)
-- **v0.5** — Module chat (Socket.io)
-- **v0.6** — Intégration Gitea
-- **v1.0** — Release stable, Docker all-in-one
+- ✅ **v0.1** — Monorepo, structure, docker-compose, Prisma schema
+- ✅ **v0.2** — Auth JWT (register, login, refresh)
+- ✅ **v0.3** — Module fichiers (MinIO, drag & drop)
+- ✅ **v0.4** — Notes collaboratives (TipTap + Y.js)
+- ✅ **v0.5** — Tâches Kanban
+- ✅ **v0.6 / v1.0** — Chat temps réel (Socket.io)
+- 🔜 **v1.1** — Intégration Gitea complète
+- 🔜 **v1.2** — Application mobile
+- 🔜 **v2.0** — IA intégrée (assistant de projet)
 
 ---
 

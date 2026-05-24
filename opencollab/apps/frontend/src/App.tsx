@@ -9,6 +9,7 @@ const FilesPage     = lazy(() => import('./pages/FilesPage'))
 const NotesPage     = lazy(() => import('./pages/NotesPage'))
 const TasksPage     = lazy(() => import('./pages/TasksPage'))
 const ChatPage      = lazy(() => import('./pages/ChatPage'))
+const GitPage       = lazy(() => import('./pages/GitPage'))
 
 function PageLoader() {
   return (
@@ -22,14 +23,15 @@ export default function App() {
   return (
     <Suspense fallback={<PageLoader />}>
       <Routes>
-        <Route path="/login"    element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/login"     element={<LoginPage />} />
+        <Route path="/register"  element={<RegisterPage />} />
         <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
-        <Route path="/files"    element={<ProtectedRoute><FilesPage /></ProtectedRoute>} />
-        <Route path="/notes"    element={<ProtectedRoute><NotesPage /></ProtectedRoute>} />
-        <Route path="/tasks"    element={<ProtectedRoute><TasksPage /></ProtectedRoute>} />
-        <Route path="/chat"     element={<ProtectedRoute><ChatPage /></ProtectedRoute>} />
-        <Route path="*"         element={<Navigate to="/dashboard" replace />} />
+        <Route path="/files"     element={<ProtectedRoute><FilesPage /></ProtectedRoute>} />
+        <Route path="/notes"     element={<ProtectedRoute><NotesPage /></ProtectedRoute>} />
+        <Route path="/tasks"     element={<ProtectedRoute><TasksPage /></ProtectedRoute>} />
+        <Route path="/chat"      element={<ProtectedRoute><ChatPage /></ProtectedRoute>} />
+        <Route path="/git"       element={<ProtectedRoute><GitPage /></ProtectedRoute>} />
+        <Route path="*"          element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </Suspense>
   )

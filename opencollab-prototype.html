@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OpenCollab — Prototype</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.0.0/tabler-icons.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --color-background-primary: #ffffff;
+      --color-background-secondary: #f4f4f5;
+      --color-background-tertiary: #e4e4e7;
+      --color-background-info: #eff6ff;
+      --color-background-success: #f0fdf4;
+      --color-background-warning: #fffbeb;
+      --color-background-danger: #fef2f2;
+      --color-text-primary: #09090b;
+      --color-text-secondary: #52525b;
+      --color-text-tertiary: #a1a1aa;
+      --color-text-info: #1d4ed8;
+      --color-text-success: #15803d;
+      --color-text-warning: #b45309;
+      --color-text-danger: #b91c1c;
+      --color-border-tertiary: rgba(0,0,0,0.1);
+      --color-border-secondary: rgba(0,0,0,0.2);
+      --color-border-info: #93c5fd;
+      --border-radius-md: 8px;
+      --border-radius-lg: 12px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --color-background-primary: #18181b;
+        --color-background-secondary: #27272a;
+        --color-background-tertiary: #3f3f46;
+        --color-background-info: #1e3a5f;
+        --color-background-success: #14532d;
+        --color-background-warning: #451a03;
+        --color-background-danger: #450a0a;
+        --color-text-primary: #fafafa;
+        --color-text-secondary: #a1a1aa;
+        --color-text-tertiary: #71717a;
+        --color-text-info: #93c5fd;
+        --color-text-success: #86efac;
+        --color-text-warning: #fcd34d;
+        --color-text-danger: #fca5a5;
+        --color-border-tertiary: rgba(255,255,255,0.1);
+        --color-border-secondary: rgba(255,255,255,0.2);
+        --color-border-info: #1d4ed8;
+      }
+    }
+
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--color-background-tertiary); display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; }
+    .app { display: flex; height: 680px; width: 100%; max-width: 1100px; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); overflow: hidden; background: var(--color-background-primary); font-size: 13px; box-shadow: 0 4px 32px rgba(0,0,0,0.08); }
+    .sidebar { width: 52px; background: var(--color-background-secondary); border-right: 0.5px solid var(--color-border-tertiary); display: flex; flex-direction: column; align-items: center; padding: 12px 0; gap: 4px; flex-shrink: 0; }
+    .nav-btn { width: 36px; height: 36px; border-radius: var(--border-radius-md); display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; background: transparent; color: var(--color-text-tertiary); transition: all .15s; font-size: 18px; }
+    .nav-btn:hover { background: var(--color-background-primary); color: var(--color-text-primary); }
+    .nav-btn.active { background: var(--color-background-info); color: var(--color-text-info); }
+    .nav-sep { width: 28px; height: 0.5px; background: var(--color-border-tertiary); margin: 4px 0; }
+    .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    .topbar { height: 44px; border-bottom: 0.5px solid var(--color-border-tertiary); display: flex; align-items: center; gap: 10px; padding: 0 16px; flex-shrink: 0; }
+    .topbar-title { font-weight: 500; font-size: 14px; color: var(--color-text-primary); }
+    .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+    .search { display: flex; align-items: center; gap: 6px; background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 5px 10px; font-size: 12px; color: var(--color-text-tertiary); cursor: pointer; }
+    .avatar { width: 26px; height: 26px; border-radius: 50%; background: var(--color-background-info); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; color: var(--color-text-info); }
+    .content { flex: 1; overflow-y: auto; padding: 20px; }
+    .panel { display: none; }
+    .panel.active { display: block; }
+    .section-title { font-size: 11px; font-weight: 500; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 10px; }
+    .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+    .card { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 14px; cursor: pointer; transition: border-color .15s; }
+    .card:hover { border-color: var(--color-border-secondary); }
+    .card-icon { font-size: 22px; margin-bottom: 8px; }
+    .card-title { font-weight: 500; font-size: 13px; color: var(--color-text-primary); margin-bottom: 2px; }
+    .card-sub { font-size: 12px; color: var(--color-text-tertiary); }
+    .activity-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 0.5px solid var(--color-border-tertiary); }
+    .activity-item:last-child { border-bottom: none; }
+    .activity-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .activity-text { font-size: 12px; color: var(--color-text-secondary); flex: 1; }
+    .activity-time { font-size: 11px; color: var(--color-text-tertiary); }
+    .file-row { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: var(--border-radius-md); cursor: pointer; transition: background .15s; }
+    .file-row:hover { background: var(--color-background-secondary); }
+    .file-icon { font-size: 18px; width: 24px; text-align: center; flex-shrink: 0; }
+    .file-name { font-size: 13px; color: var(--color-text-primary); flex: 1; }
+    .file-meta { font-size: 11px; color: var(--color-text-tertiary); }
+    .dropzone { border: 1.5px dashed var(--color-border-secondary); border-radius: var(--border-radius-lg); padding: 28px; text-align: center; margin-bottom: 16px; color: var(--color-text-tertiary); font-size: 13px; cursor: pointer; transition: all .15s; }
+    .dropzone:hover { border-color: var(--color-border-info); background: var(--color-background-info); color: var(--color-text-info); }
+    .note-layout { display: flex; height: 520px; margin: -20px; overflow: hidden; }
+    .note-sidebar { width: 180px; border-right: 0.5px solid var(--color-border-tertiary); padding: 12px 0; flex-shrink: 0; overflow-y: auto; }
+    .note-item { padding: 7px 14px; cursor: pointer; font-size: 12px; color: var(--color-text-secondary); transition: background .15s; display: flex; align-items: center; gap: 6px; }
+    .note-item:hover, .note-item.active { background: var(--color-background-secondary); color: var(--color-text-primary); }
+    .note-editor { flex: 1; padding: 24px; overflow-y: auto; }
+    .note-title-input { font-size: 22px; font-weight: 500; color: var(--color-text-primary); background: transparent; border: none; outline: none; width: 100%; margin-bottom: 16px; }
+    .note-body { font-size: 13px; color: var(--color-text-secondary); line-height: 1.8; }
+    .collab-badge { display: inline-flex; align-items: center; gap: 4px; background: var(--color-background-success); color: var(--color-text-success); border-radius: 999px; padding: 2px 8px; font-size: 11px; margin-left: 8px; }
+    .kanban { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px; }
+    .col { min-width: 160px; flex-shrink: 0; }
+    .col-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .col-label { font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 999px; }
+    .col-label.backlog { background: var(--color-background-secondary); color: var(--color-text-secondary); }
+    .col-label.todo { background: var(--color-background-info); color: var(--color-text-info); }
+    .col-label.prog { background: #fef3c7; color: #92400e; }
+    .col-label.review { background: #f3e8ff; color: #6b21a8; }
+    .col-label.done { background: var(--color-background-success); color: var(--color-text-success); }
+    .task-card { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 10px; margin-bottom: 8px; cursor: grab; font-size: 12px; }
+    .task-card:hover { border-color: var(--color-border-secondary); }
+    .task-title { color: var(--color-text-primary); font-weight: 500; margin-bottom: 6px; line-height: 1.4; }
+    .task-footer { display: flex; align-items: center; justify-content: space-between; }
+    .priority { font-size: 11px; }
+    .priority.high { color: #f97316; } .priority.urgent { color: #ef4444; } .priority.medium { color: var(--color-text-info); } .priority.low { color: var(--color-text-tertiary); }
+    .assignee-dot { width: 18px; height: 18px; border-radius: 50%; background: var(--color-background-warning); display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 500; color: var(--color-text-warning); }
+    .chat-layout { display: flex; height: 520px; margin: -20px; overflow: hidden; }
+    .chan-list { width: 160px; border-right: 0.5px solid var(--color-border-tertiary); padding: 10px 0; overflow-y: auto; flex-shrink: 0; }
+    .chan-item { padding: 6px 14px; cursor: pointer; font-size: 12px; color: var(--color-text-secondary); display: flex; align-items: center; gap: 6px; transition: background .15s; }
+    .chan-item:hover, .chan-item.active { background: var(--color-background-secondary); color: var(--color-text-primary); }
+    .chat-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    .chat-header { padding: 10px 16px; border-bottom: 0.5px solid var(--color-border-tertiary); display: flex; align-items: center; gap: 8px; }
+    .messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+    .msg { display: flex; gap: 10px; }
+    .msg-avatar { width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; }
+    .msg-content { flex: 1; }
+    .msg-header { display: flex; align-items: baseline; gap: 8px; margin-bottom: 3px; }
+    .msg-name { font-size: 12px; font-weight: 500; color: var(--color-text-primary); }
+    .msg-time { font-size: 11px; color: var(--color-text-tertiary); }
+    .msg-text { font-size: 13px; color: var(--color-text-secondary); line-height: 1.6; }
+    .chat-input-area { padding: 10px 14px; border-top: 0.5px solid var(--color-border-tertiary); }
+    .chat-input { width: 100%; background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 8px 12px; font-size: 13px; color: var(--color-text-primary); outline: none; }
+    .chat-input::placeholder { color: var(--color-text-tertiary); }
+    .repo-card { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 14px; margin-bottom: 10px; cursor: pointer; transition: border-color .15s; }
+    .repo-card:hover { border-color: var(--color-border-secondary); }
+    .repo-name { font-weight: 500; font-size: 13px; color: var(--color-text-primary); margin-bottom: 4px; }
+    .repo-desc { font-size: 12px; color: var(--color-text-tertiary); margin-bottom: 10px; }
+    .repo-stats { display: flex; gap: 14px; font-size: 11px; color: var(--color-text-tertiary); }
+    .badge { display: inline-flex; align-items: center; font-size: 11px; padding: 2px 8px; border-radius: 999px; font-weight: 500; }
+    .badge-blue { background: var(--color-background-info); color: var(--color-text-info); }
+    .badge-gray { background: var(--color-background-secondary); color: var(--color-text-secondary); }
+    .ai-tool { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 14px; margin-bottom: 14px; }
+    .ai-tool-title { font-weight: 500; font-size: 13px; color: var(--color-text-primary); margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+    .ai-tool-desc { font-size: 12px; color: var(--color-text-tertiary); margin-bottom: 10px; }
+    .ai-result { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 10px; font-size: 12px; color: var(--color-text-secondary); line-height: 1.7; margin-top: 8px; white-space: pre-wrap; display: none; }
+    .btn-primary { background: var(--color-background-info); color: var(--color-text-info); border: none; border-radius: var(--border-radius-md); padding: 6px 14px; font-size: 12px; cursor: pointer; font-weight: 500; }
+    .btn-ghost { background: transparent; color: var(--color-text-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 6px 14px; font-size: 12px; cursor: pointer; }
+    .connected-dot { width: 7px; height: 7px; border-radius: 50%; background: #22c55e; animation: pulse 2s infinite; display: inline-block; }
+    @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.4} }
+    .typing { display: flex; align-items: center; gap: 4px; padding: 4px 0; }
+    .typing-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--color-text-tertiary); animation: bounce .8s infinite; }
+    .typing-dot:nth-child(2) { animation-delay: .15s; }
+    .typing-dot:nth-child(3) { animation-delay: .3s; }
+    @keyframes bounce { 0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-4px)} }
+    select, input, textarea { font-family: inherit; }
+  </style>
+</head>
+<body>
+
+<div class="app">
+  <div class="sidebar">
+    <div class="nav-btn active" onclick="show('dashboard')" id="btn-dashboard" title="Dashboard"><i class="ti ti-layout-dashboard"></i></div>
+    <div class="nav-btn" onclick="show('files')" id="btn-files" title="Fichiers"><i class="ti ti-files"></i></div>
+    <div class="nav-btn" onclick="show('notes')" id="btn-notes" title="Notes"><i class="ti ti-note"></i></div>
+    <div class="nav-btn" onclick="show('tasks')" id="btn-tasks" title="Tâches"><i class="ti ti-layout-kanban"></i></div>
+    <div class="nav-btn" onclick="show('chat')" id="btn-chat" title="Chat"><i class="ti ti-message-circle"></i></div>
+    <div class="nav-btn" onclick="show('git')" id="btn-git" title="Code"><i class="ti ti-brand-git"></i></div>
+    <div class="nav-btn" onclick="show('ai')" id="btn-ai" title="IA"><i class="ti ti-sparkles"></i></div>
+    <div class="nav-sep"></div>
+    <div class="nav-btn" title="Paramètres"><i class="ti ti-settings"></i></div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <span class="topbar-title" id="page-title">Dashboard</span>
+      <div class="topbar-right">
+        <div class="search"><i class="ti ti-search" style="font-size:14px"></i><span>Rechercher…</span></div>
+        <span class="connected-dot" title="Connecté"></span>
+        <div class="avatar">GL</div>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- DASHBOARD -->
+      <div class="panel active" id="panel-dashboard">
+        <p style="font-size:16px;font-weight:500;color:var(--color-text-primary);margin-bottom:16px">Bonjour, Gabriel 👋</p>
+        <p class="section-title">Modules</p>
+        <div class="grid3">
+          <div class="card" onclick="show('files')"><div class="card-icon">📁</div><div class="card-title">Fichiers</div><div class="card-sub">34 fichiers</div></div>
+          <div class="card" onclick="show('notes')"><div class="card-icon">📝</div><div class="card-title">Notes</div><div class="card-sub">12 pages</div></div>
+          <div class="card" onclick="show('tasks')"><div class="card-icon">📋</div><div class="card-title">Tâches</div><div class="card-sub">7 en cours</div></div>
+          <div class="card" onclick="show('chat')"><div class="card-icon">💬</div><div class="card-title">Chat</div><div class="card-sub">3 salons</div></div>
+          <div class="card" onclick="show('git')"><div class="card-icon">💻</div><div class="card-title">Code</div><div class="card-sub">4 dépôts</div></div>
+          <div class="card" onclick="show('ai')"><div class="card-icon">🤖</div><div class="card-title">IA</div><div class="card-sub">Assistant actif</div></div>
+        </div>
+        <p class="section-title">Activité récente</p>
+        <div>
+          <div class="activity-item"><div class="activity-dot" style="background:#3b82f6"></div><div class="activity-text">Commit <b>fix: auth middleware</b> poussé sur main</div><div class="activity-time">5 min</div></div>
+          <div class="activity-item"><div class="activity-dot" style="background:#10b981"></div><div class="activity-text">Note <b>Spec API v2</b> modifiée par Alice</div><div class="activity-time">22 min</div></div>
+          <div class="activity-item"><div class="activity-dot" style="background:#f59e0b"></div><div class="activity-text">Tâche <b>Intégration Stripe</b> déplacée en revue</div><div class="activity-time">1h</div></div>
+          <div class="activity-item"><div class="activity-dot" style="background:#8b5cf6"></div><div class="activity-text">Fichier <b>maquette-v3.pdf</b> uploadé</div><div class="activity-time">2h</div></div>
+          <div class="activity-item"><div class="activity-dot" style="background:#ef4444"></div><div class="activity-text">Issue <b>#42 — Bug login mobile</b> ouverte</div><div class="activity-time">3h</div></div>
+        </div>
+      </div>
+
+      <!-- FICHIERS -->
+      <div class="panel" id="panel-files">
+        <div class="dropzone"><i class="ti ti-upload" style="font-size:22px;margin-bottom:6px;display:block"></i>Glissez vos fichiers ici ou cliquez pour parcourir<br><span style="font-size:11px">Max 100 MB</span></div>
+        <p class="section-title">Fichiers récents</p>
+        <div class="file-row"><div class="file-icon">📄</div><div class="file-name">rapport-q1-2025.pdf</div><div class="file-meta">2.4 MB · Alice · 2 jan</div></div>
+        <div class="file-row"><div class="file-icon">🖼️</div><div class="file-name">maquette-dashboard-v3.png</div><div class="file-meta">890 KB · Gabriel · 3 jan</div></div>
+        <div class="file-row"><div class="file-icon">📊</div><div class="file-name">budget-2025.xlsx</div><div class="file-meta">145 KB · Bob · 5 jan</div></div>
+        <div class="file-row"><div class="file-icon">📦</div><div class="file-name">assets-v2.zip</div><div class="file-meta">18 MB · Gabriel · 6 jan</div></div>
+        <div class="file-row"><div class="file-icon">📃</div><div class="file-name">README.md</div><div class="file-meta">4 KB · Alice · 7 jan</div></div>
+        <div class="file-row"><div class="file-icon">🎬</div><div class="file-name">demo-produit.mp4</div><div class="file-meta">54 MB · Bob · 8 jan</div></div>
+      </div>
+
+      <!-- NOTES -->
+      <div class="panel" id="panel-notes">
+        <div class="note-layout">
+          <div class="note-sidebar">
+            <div style="padding:8px 14px 4px;font-size:11px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.06em">Notes</div>
+            <div class="note-item active" data-title="Spec API v2" data-body="Cette note décrit les endpoints REST de la v2...\n\nEndpoints prévus :\n• POST /api/auth/register\n• POST /api/auth/login\n• GET  /api/users/me\n• POST /api/files/upload\n• GET  /api/notes"><i class="ti ti-note" style="font-size:13px"></i>Spec API v2</div>
+            <div class="note-item" data-title="Réunion 8 jan" data-body="Participants : Gabriel, Alice, Bob\n\nPoints abordés :\n1. Revue du sprint précédent\n2. Planification v1.2\n3. Discussion module IA\n\nActions :\n• Gabriel — finir routes auth\n• Alice — maquettes mobile\n• Bob — tests unitaires"><i class="ti ti-note" style="font-size:13px"></i>Réunion 8 jan</div>
+            <div class="note-item" data-title="Roadmap produit" data-body="Vision\nOpenCollab — plateforme tout-en-un\n\nPriorités\n1. Finir module IA (v1.2)\n2. Workspace multi-users (v1.3)\n3. Thème clair/sombre (v1.4)\n4. Recherche globale (v1.5)"><i class="ti ti-note" style="font-size:13px"></i>Roadmap produit</div>
+            <div class="note-item" data-title="Idées features" data-body="• Commentaires sur fichiers\n• Export PDF des notes\n• Intégration Google Cal\n• Mode Pomodoro\n• Signatures électroniques\n• Module éducatif profs/élèves"><i class="ti ti-note" style="font-size:13px"></i>Idées features</div>
+          </div>
+          <div class="note-editor">
+            <div style="display:flex;align-items:center;margin-bottom:16px">
+              <input class="note-title-input" id="note-title" value="Spec API v2" />
+              <span class="collab-badge"><span class="connected-dot" style="width:5px;height:5px"></span>2 en ligne</span>
+            </div>
+            <div class="note-body" id="note-body"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TÂCHES -->
+      <div class="panel" id="panel-tasks">
+        <div class="kanban">
+          <div class="col">
+            <div class="col-header"><span class="col-label backlog">Backlog</span><span style="font-size:11px;color:var(--color-text-tertiary)">3</span></div>
+            <div class="task-card"><div class="task-title">Intégration calendrier Google</div><div class="task-footer"><span class="priority low">↓ Basse</span></div></div>
+            <div class="task-card"><div class="task-title">Mode hors-ligne</div><div class="task-footer"><span class="priority medium">→ Moyenne</span></div></div>
+            <div class="task-card"><div class="task-title">Export PDF des notes</div><div class="task-footer"><span class="priority low">↓ Basse</span></div></div>
+          </div>
+          <div class="col">
+            <div class="col-header"><span class="col-label todo">À faire</span><span style="font-size:11px;color:var(--color-text-tertiary)">2</span></div>
+            <div class="task-card"><div class="task-title">Routes module IA</div><div class="task-footer"><span class="priority high">↑ Haute</span><div class="assignee-dot">G</div></div></div>
+            <div class="task-card"><div class="task-title">Tests unitaires auth</div><div class="task-footer"><span class="priority medium">→ Moyenne</span><div class="assignee-dot">B</div></div></div>
+          </div>
+          <div class="col">
+            <div class="col-header"><span class="col-label prog">En cours</span><span style="font-size:11px;color:var(--color-text-tertiary)">2</span></div>
+            <div class="task-card"><div class="task-title">Adaptateur AI multi-provider</div><div class="task-footer"><span class="priority urgent">⚡ Urgente</span><div class="assignee-dot">G</div></div></div>
+            <div class="task-card"><div class="task-title">Maquettes app mobile</div><div class="task-footer"><span class="priority high">↑ Haute</span><div class="assignee-dot">A</div></div></div>
+          </div>
+          <div class="col">
+            <div class="col-header"><span class="col-label review">En revue</span><span style="font-size:11px;color:var(--color-text-tertiary)">1</span></div>
+            <div class="task-card"><div class="task-title">Intégration Stripe</div><div class="task-footer"><span class="priority high">↑ Haute</span><div class="assignee-dot">B</div></div></div>
+          </div>
+          <div class="col">
+            <div class="col-header"><span class="col-label done">Terminé</span><span style="font-size:11px;color:var(--color-text-tertiary)">5</span></div>
+            <div class="task-card" style="opacity:.6"><div class="task-title">Module chat Socket.io</div><div class="task-footer"><span class="priority medium">→ Moyenne</span></div></div>
+            <div class="task-card" style="opacity:.6"><div class="task-title">Auth JWT complète</div><div class="task-footer"><span class="priority high">↑ Haute</span></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHAT -->
+      <div class="panel" id="panel-chat">
+        <div class="chat-layout">
+          <div class="chan-list">
+            <div style="padding:8px 14px 4px;font-size:11px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.06em">Salons</div>
+            <div class="chan-item active" data-chan="général"><i class="ti ti-hash" style="font-size:12px;color:var(--color-text-tertiary)"></i>général</div>
+            <div class="chan-item" data-chan="dev"><i class="ti ti-hash" style="font-size:12px;color:var(--color-text-tertiary)"></i>dev</div>
+            <div class="chan-item" data-chan="design"><i class="ti ti-hash" style="font-size:12px;color:var(--color-text-tertiary)"></i>design</div>
+            <div style="padding:8px 14px 4px;margin-top:4px;font-size:11px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.06em">Privés</div>
+            <div class="chan-item" data-chan="Alice L."><i class="ti ti-lock" style="font-size:12px;color:var(--color-text-tertiary)"></i>Alice L.</div>
+          </div>
+          <div class="chat-area">
+            <div class="chat-header">
+              <i class="ti ti-hash" style="color:var(--color-text-tertiary);font-size:14px"></i>
+              <span style="font-size:13px;font-weight:500;color:var(--color-text-primary)" id="chan-name">général</span>
+              <span class="connected-dot" style="margin-left:auto"></span>
+              <span style="font-size:11px;color:var(--color-text-tertiary);margin-left:4px">3 en ligne</span>
+            </div>
+            <div class="messages" id="messages">
+              <div class="msg"><div class="msg-avatar" style="background:var(--color-background-info);color:var(--color-text-info)">AL</div><div class="msg-content"><div class="msg-header"><span class="msg-name">Alice L.</span><span class="msg-time">10:32</span></div><div class="msg-text">J'ai fini les maquettes mobile, je pousse ça sur feat/mobile</div></div></div>
+              <div class="msg"><div class="msg-avatar" style="background:var(--color-background-warning);color:var(--color-text-warning)">BM</div><div class="msg-content"><div class="msg-header"><span class="msg-name">Bob M.</span><span class="msg-time">10:35</span></div><div class="msg-text">Top ! Les tests auth passent tous en vert 🎉</div></div></div>
+              <div class="msg"><div class="msg-avatar" style="background:var(--color-background-success);color:var(--color-text-success)">GL</div><div class="msg-content"><div class="msg-header"><span class="msg-name">Gabriel</span><span class="msg-time">10:41</span></div><div class="msg-text">Super, je finis le module IA aujourd'hui, démo demain à 14h ?</div></div></div>
+              <div class="msg"><div class="msg-avatar" style="background:var(--color-background-info);color:var(--color-text-info)">AL</div><div class="msg-content"><div class="msg-header"><span class="msg-name">Alice L.</span><span class="msg-time">10:42</span></div><div class="msg-text">Oui parfait 👍</div></div></div>
+              <div class="typing"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div><span style="font-size:11px;color:var(--color-text-tertiary);margin-left:6px">Bob écrit…</span></div>
+            </div>
+            <div class="chat-input-area">
+              <input class="chat-input" id="chat-input" placeholder="Envoyer un message dans #général…" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CODE -->
+      <div class="panel" id="panel-git">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <p class="section-title" style="margin:0">Dépôts Gitea</p>
+          <button class="btn-primary">+ Nouveau dépôt</button>
+        </div>
+        <div class="repo-card"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px"><div class="repo-name">opencollab</div><span class="badge badge-blue">public</span></div><div class="repo-desc">Plateforme collaborative open source auto-hébergeable</div><div class="repo-stats"><span>⭐ 24</span><span>🍴 3</span><span>🐛 7 issues</span><span>main</span></div></div>
+        <div class="repo-card"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px"><div class="repo-name">opencollab-mobile</div><span class="badge badge-gray">privé</span></div><div class="repo-desc">Application mobile React Native</div><div class="repo-stats"><span>⭐ 2</span><span>🍴 0</span><span>🐛 2 issues</span><span>develop</span></div></div>
+        <div class="repo-card"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px"><div class="repo-name">ui-components</div><span class="badge badge-blue">public</span></div><div class="repo-desc">Bibliothèque de composants React partagée</div><div class="repo-stats"><span>⭐ 8</span><span>🍴 1</span><span>🐛 1 issue</span><span>main</span></div></div>
+      </div>
+
+      <!-- IA -->
+      <div class="panel" id="panel-ai">
+        <div class="ai-tool">
+          <div class="ai-tool-title"><i class="ti ti-file-text" style="font-size:15px"></i>Résumé de note</div>
+          <div class="ai-tool-desc">Résumé automatique de vos notes</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <select style="flex:1;font-size:12px;padding:6px 10px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);color:var(--color-text-primary)"><option>Spec API v2</option><option>Réunion 8 jan</option><option>Roadmap produit</option></select>
+            <select style="font-size:12px;padding:6px 10px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);color:var(--color-text-primary)"><option>Bullet points</option><option>Paragraphe</option><option>TL;DR</option></select>
+            <button class="btn-primary" id="btn-summarize">Résumer</button>
+          </div>
+          <div class="ai-result" id="summarize-result"></div>
+        </div>
+        <div class="ai-tool">
+          <div class="ai-tool-title"><i class="ti ti-checkbox" style="font-size:15px"></i>Suggestions de tâches</div>
+          <div class="ai-tool-desc">L'IA analyse le workspace et propose des tâches</div>
+          <button class="btn-primary" id="btn-suggest">Analyser le workspace</button>
+          <div class="ai-result" id="suggest-result"></div>
+        </div>
+        <div class="ai-tool">
+          <div class="ai-tool-title"><i class="ti ti-code" style="font-size:15px"></i>Analyse de code</div>
+          <div class="ai-tool-desc">Expliquer, revoir ou améliorer du code</div>
+          <div style="display:flex;gap:8px;margin-bottom:8px">
+            <button class="btn-ghost" id="act-explain" onclick="setAct('explain')">Expliquer</button>
+            <button class="btn-ghost" id="act-review" onclick="setAct('review')">Review</button>
+            <button class="btn-ghost" id="act-improve" onclick="setAct('improve')">Améliorer</button>
+            <button class="btn-ghost" id="act-document" onclick="setAct('document')">Documenter</button>
+          </div>
+          <textarea id="code-input" style="width:100%;height:72px;font-family:monospace;font-size:11px;padding:8px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);color:var(--color-text-primary);resize:none" placeholder="const auth = async (req) => { ... }"></textarea>
+          <button class="btn-primary" style="margin-top:8px" id="btn-analyze">Analyser</button>
+          <div class="ai-result" id="analyze-result"></div>
+        </div>
+        <div class="ai-tool">
+          <div class="ai-tool-title"><i class="ti ti-message-bolt" style="font-size:15px"></i>Chat assistant</div>
+          <div class="ai-tool-desc">Posez une question sur votre projet</div>
+          <div style="display:flex;gap:8px">
+            <input id="ai-question" style="flex:1;font-size:12px;padding:7px 12px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);color:var(--color-text-primary)" placeholder="Comment optimiser les performances de l'auth ?" />
+            <button class="btn-primary" id="btn-chat-ai">Envoyer</button>
+          </div>
+          <div class="ai-result" id="chat-result"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+const titles = {dashboard:'Dashboard',files:'Fichiers',notes:'Notes',tasks:'Tâches',chat:'Chat',git:'Code',ai:'Assistant IA'}
+
+function show(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'))
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'))
+  document.getElementById('panel-' + id).classList.add('active')
+  document.getElementById('btn-' + id).classList.add('active')
+  document.getElementById('page-title').textContent = titles[id]
+}
+
+document.querySelectorAll('.note-item').forEach(item => {
+  item.addEventListener('click', function() {
+    document.querySelectorAll('.note-item').forEach(n => n.classList.remove('active'))
+    this.classList.add('active')
+    document.getElementById('note-title').value = this.dataset.title
+    document.getElementById('note-body').innerHTML = this.dataset.body.replace(/\n/g, '<br>')
+  })
+})
+
+document.getElementById('note-body').innerHTML = document.querySelector('.note-item.active').dataset.body.replace(/\n/g, '<br>')
+
+document.querySelectorAll('.chan-item').forEach(item => {
+  item.addEventListener('click', function() {
+    document.querySelectorAll('.chan-item').forEach(c => c.classList.remove('active'))
+    this.classList.add('active')
+    const name = this.dataset.chan
+    document.getElementById('chan-name').textContent = name
+    document.getElementById('chat-input').placeholder = 'Envoyer un message dans #' + name + '…'
+  })
+})
+
+document.getElementById('chat-input').addEventListener('keydown', function(e) {
+  if(e.key !== 'Enter' || !this.value.trim()) return
+  const msgs = document.getElementById('messages')
+  const div = document.createElement('div')
+  div.className = 'msg'
+  const t = new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})
+  div.innerHTML = `<div class="msg-avatar" style="background:var(--color-background-success);color:var(--color-text-success)">GL</div><div class="msg-content"><div class="msg-header"><span class="msg-name">Gabriel</span><span class="msg-time">${t}</span></div><div class="msg-text">${this.value}</div></div>`
+  msgs.insertBefore(div, msgs.querySelector('.typing'))
+  this.value = ''
+  msgs.scrollTop = msgs.scrollHeight
+})
+
+let codeAct = 'explain'
+function setAct(a) {
+  codeAct = a
+  ['explain','review','improve','document'].forEach(x => document.getElementById('act-'+x).style.borderColor = 'var(--color-border-tertiary)')
+  document.getElementById('act-'+a).style.borderColor = 'var(--color-border-info)'
+}
+
+function typeText(el, text) {
+  el.style.display = 'block'
+  el.textContent = ''
+  let i = 0
+  const iv = setInterval(() => { el.textContent += text[i++]; if(i >= text.length) clearInterval(iv) }, 16)
+}
+
+document.getElementById('btn-summarize').onclick = () => typeText(document.getElementById('summarize-result'),
+  '• La note décrit les endpoints REST de la v2\n• Auth via JWT (register, login, refresh)\n• Gestion fichiers avec upload MinIO\n• API notes avec collaboration temps réel\n• Tous les endpoints nécessitent un Bearer token')
+
+document.getElementById('btn-suggest').onclick = () => typeText(document.getElementById('suggest-result'),
+  '1. ⚡ Rate limiting sur /api/auth/login [URGENT]\n2. 🧪 Tests d\'intégration module IA [HAUTE]\n3. 📱 Wireframes vue mobile Kanban [HAUTE]\n4. 🔔 Notifications temps réel [MOYENNE]\n5. 📊 Métriques de performance dashboard [BASSE]')
+
+document.getElementById('btn-analyze').onclick = () => {
+  const r = {explain:'Middleware d\'authentification async. Vérifie le token JWT dans les headers, valide la signature et injecte le payload utilisateur dans l\'objet request.',review:'⚠️ Problèmes détectés :\n• Pas de gestion d\'erreur (try/catch manquant)\n• Token non invalidé côté serveur à la déconnexion\n• Recommandation : blacklist Redis pour tokens révoqués',improve:'Version améliorée :\nconst auth = async (req, reply) => {\n  try {\n    const token = req.headers.authorization?.slice(7)\n    if (!token) return reply.status(401).send({error:"Token manquant"})\n    req.user = verifyAccessToken(token)\n  } catch {\n    return reply.status(401).send({error:"Token invalide"})\n  }\n}',document:'/**\n * Middleware d\'authentification JWT\n * @param {FastifyRequest} req\n * @param {FastifyReply} reply\n * @throws {401} Token absent ou invalide\n */'}
+  typeText(document.getElementById('analyze-result'), r[codeAct] || r.explain)
+}
+
+document.getElementById('btn-chat-ai').onclick = () => typeText(document.getElementById('chat-result'),
+  'Pour optimiser les performances de l\'auth :\n\n1. Mettre en cache les vérifications JWT dans Redis\n2. Utiliser ES256 plutôt que HS256 pour la signature\n3. Rate limiter /api/auth/login (5 tentatives/min)\n4. Access tokens courts (15min) + refresh tokens longs (7j)')
+document.getElementById('ai-question').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('btn-chat-ai').click() })
+</script>
+</body>
+</html>
